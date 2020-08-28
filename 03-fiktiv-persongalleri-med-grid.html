@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background-color: #e6e6e6;
+        }
+
+        img {
+            width: 100%;
+        }
+
+        .data-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-gap: 40px;
+            padding: 40px;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .person {
+            display: flex;
+            flex-direction: column;
+
+            text-align: center;
+            background-color: #fff;
+            border-radius: 2px;
+              box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        }
+
+        .navn {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: sans-serif;
+        }
+
+        .religion,
+        .hobby {
+            font-size: 1.2rem;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="data-container">
+
+    </section>
+
+    <template>
+        <article class="person">
+            <h3 class="navn"></h3>
+            <img class="billede" src="" alt="">
+            <p class="religion">Religion: </p>
+            <p class="hobby">Hobby: </p>
+        </article>
+    </template>
+
+
+    <script>
+        window.addEventListener("DOMContentLoaded", start);
+
+        function start() {
+            console.log("Loaded!");
+
+            const dataContainer = document.querySelector(".data-container");
+            const personTemplate = document.querySelector("template");
+            const googleSheetLink = "https://spreadsheets.google.com/feeds/list/1mtHhpoEkYqVqr1TSnKQ1_sQZWI7FRVjcw3H1oatDOVQ/od6/public/values?alt=json"
+
+            async function hentData() {
+                const response = await fetch(googleSheetLink);
+                const json = await response.json();
+                vis(json);
+                console.log(json);
+            }
+
+            function vis(json) {
+                json.feed.entry.forEach(person => {
+                    let templateClone = personTemplate.cloneNode(true).content;
+
+                    templateClone.querySelector(".navn").textContent = `${person.gsx$navn.$t} ${person.gsx$efternavn.$t}`;
+                    templateClone.querySelector(".religion").textContent += person.gsx$religion.$t;
+                    templateClone.querySelector(".hobby").textContent += person.gsx$hobby.$t;
+                    templateClone.querySelector(".billede").src = person.gsx$billede.$t;
+                    templateClone.querySelector(".billede").alt = `${person.gsx$navn.$t} ${person.gsx$efternavn.$t}`;
+
+                    dataContainer.appendChild(templateClone);
+                });
+            }
+
+            hentData();
+
+        }
+    </script>
+</body></html>
